@@ -11,7 +11,7 @@ class Movie(models.Model):
     year        = models.IntegerField()
     genre       = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
     country     = models.CharField(max_length=40)
-    stars       = models.DecimalField(max_digits=2, decimal_places=1)
+    stars       = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
     runtime     = models.IntegerField()
     description = models.TextField()
     image_url   = models.URLField(max_length=2000)
