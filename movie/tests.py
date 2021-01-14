@@ -60,6 +60,7 @@ class AllMoviesTest(TestCase):
                 }]
             }
         )
+        
     def test_all_movies_get_not_found(self):
         client=Client()
         response=client.get('/movie')
