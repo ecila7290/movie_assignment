@@ -2,6 +2,7 @@ import json
 
 from django.views import View
 from django.http import JsonResponse
+from django.core.exceptions import FieldDoesNotExist
 
 from .models import Movie, MovieCast
 
@@ -71,5 +72,32 @@ class MovieDetailView(View):
             
             return JsonResponse(data, status=200)
 
+        except Movie.DoesNotExist:
+            return JsonResponse({'message':'Movie does not exist.'}, status=404)
+
+    def put(self, request, movie_id):
+        try:
+            data=json.loads(request.body)
+            Movie.objects.filter(id=movie_id).update(**data)
+
+            movie=Movie.objects.get(id=movie_id)
+
+            movie_data={
+                'movie':{
+                        'title'      : movie.title,
+                        'year'       : movie.year,
+                        'genre'      : movie.genre.name,
+                        'country'    : movie.country,
+                        'stars'      : movie.stars,
+                        'runtime'    : movie.runtime,
+                        'description': movie.description,
+                        'image'      : movie.image_url
+                }
+            }
+            
+            return JsonResponse(movie_data, status=200)
+        
+        except FieldDoesNotExist as e:
+            return JsonResponse({'message':f"{e}"}, status=400)
         except Movie.DoesNotExist:
             return JsonResponse({'message':'Movie does not exist.'}, status=404)
