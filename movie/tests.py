@@ -189,3 +189,50 @@ class MovieDetailTest(TestCase):
         self.assertEqual(response.json(),
             {'message':'Movie does not exist.'}
         )
+
+    def test_movie_detail_put_success(self):
+        client=Client()
+        movie={
+            'title' : 'put movie'
+        }
+        response=client.put('/movies/1', movie, content_type='application/json')
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.json(),
+            {
+                'movie': {
+                'title'      : 'put movie',
+                'year'       : 2020,
+                'genre'      : 'drama',
+                'country'    : 'US',
+                'stars'      : '3.3',
+                'runtime'    : 123,
+                'description': 'movie description',
+                'image'      : 'image.com'
+                }
+            }
+        )
+
+    def test_movie_detail_put_no_field(self):
+        client=Client()
+        movie={
+            'titl' : 'put movie'
+        }
+        response=client.put('/movies/1', movie, content_type='application/json')
+
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(response.json(),
+            {'message':"Movie has no field named 'titl'"}
+        )
+    
+    def test_movie_detail_put_not_found(self):
+        client=Client()
+        movie={
+            'title' : 'put movie'
+        }
+        response=client.put('/movies/999', movie, content_type='application/json')
+
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.json(),
+            {'message':'Movie does not exist.'}
+        )
