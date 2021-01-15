@@ -2,7 +2,7 @@ import json
 
 from django.test import TestCase, Client
 
-from .models import Genre, Movie, MainSub, Cast, MovieCast
+from .models import Genre, Movie
 
 class MoviesTest(TestCase):
     def setUp(self):
@@ -117,39 +117,10 @@ class MovieDetailTest(TestCase):
             description='movie description',
             image_url='image.com'
         )
-        MainSub.objects.bulk_create([
-            MainSub(id=1,
-            name='main'),
-            MainSub(id=2,
-            name='sub')
-        ])
-        Cast.objects.bulk_create([
-            Cast(id=1,
-            name='john',
-            image_url='johnimage.com'),
-            Cast(id=2,
-            name='ann',
-            image_url='annimage.com')
-        ])
-        MovieCast.objects.bulk_create([
-            MovieCast(id=1,
-            movie_id=1,
-            cast_id=1,
-            mainsub_id=1,
-            role_name='johnson'),
-            MovieCast(id=2,
-            movie_id=1,
-            cast_id=2,
-            mainsub_id=1,
-            role_name='annie')
-        ])
 
     def tearDown(self):
         Genre.objects.all().delete()
         Movie.objects.all().delete()
-        MainSub.objects.all().delete()
-        Cast.objects.all().delete()
-        MovieCast.objects.all().delete()
 
     def test_movie_detail_get_success(self):
         client=Client()
@@ -166,18 +137,7 @@ class MovieDetailTest(TestCase):
                 'runtime'    : 123,
                 'description': 'movie description',
                 'image'      : 'image.com'
-                },
-                'casts':[{
-                    'name'     : 'john',
-                    'role_name': 'johnson',
-                    'mainsub'  : 'main',
-                    'image'    : 'johnimage.com'
-                }, {
-                    'name'     : 'ann',
-                    'role_name': 'annie',
-                    'mainsub'  : 'main',
-                    'image'    : 'annimage.com'
-                }]
+                }
             }
         )
     
@@ -231,6 +191,24 @@ class MovieDetailTest(TestCase):
             'title' : 'put movie'
         }
         response=client.put('/movies/999', movie, content_type='application/json')
+
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(response.json(),
+            {'message':'Movie does not exist.'}
+        )
+
+    def test_movie_detail_delete_success(self):
+        client=Client()
+        response=client.delete('/movies/1')
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.json(),
+            {'message':'Deleted successfully'}
+        )
+
+    def test_movie_detail_delete_not_found(self):
+        client=Client()
+        response=client.delete('/movies/999')
 
         self.assertEqual(response.status_code,404)
         self.assertEqual(response.json(),
