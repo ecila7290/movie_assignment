@@ -4,7 +4,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.core.exceptions import FieldDoesNotExist
 
-from .models import Movie, MovieCast
+from .models import Movie
 
 class MoviesView(View):
     def get(self, request):
@@ -47,8 +47,7 @@ class MovieDetailView(View):
     def get(self, request, movie_id):
         try:
             movie = Movie.objects.select_related('genre').get(id=movie_id)
-            casts = MovieCast.objects.select_related('movie', 'cast','mainsub').filter(movie_id=movie_id).order_by('id')
-
+            
             data  = {
                 'movie':{
                     'title'      : movie.title,
@@ -59,15 +58,7 @@ class MovieDetailView(View):
                     'runtime'    : movie.runtime,
                     'description': movie.description,
                     'image'      : movie.image_url
-                },
-                'casts': 
-                    [{
-                        'name'     : cast.cast.name,
-                        'role_name': cast.role_name,
-                        'mainsub'  : cast.mainsub.name,
-                        'image'    : cast.cast.image_url
-                    } for cast in casts]
-                
+                }
             }
             
             return JsonResponse(data, status=200)
@@ -80,7 +71,7 @@ class MovieDetailView(View):
             data=json.loads(request.body)
             Movie.objects.filter(id=movie_id).update(**data)
 
-            movie=Movie.objects.get(id=movie_id)
+            movie=Movie.objects.select_related('genre').get(id=movie_id)
 
             movie_data={
                 'movie':{
@@ -99,5 +90,14 @@ class MovieDetailView(View):
         
         except FieldDoesNotExist as e:
             return JsonResponse({'message':f"{e}"}, status=400)
+        except Movie.DoesNotExist:
+            return JsonResponse({'message':'Movie does not exist.'}, status=404)
+
+    def delete(self, request, movie_id):
+        try:
+            Movie.objects.get(id=movie_id).delete()
+
+            return JsonResponse({'message':'Deleted successfully'}, status=200)
+
         except Movie.DoesNotExist:
             return JsonResponse({'message':'Movie does not exist.'}, status=404)
