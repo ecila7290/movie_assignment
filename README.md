@@ -60,6 +60,13 @@ python manage.py runserver
 위 명령을 실행하면 서버가 localhost에서 실행되고, Postman, Curl 등으로 API가 제대로 동작하는지 확인할 수 있습니다.
 다만 runserver 명령은 배포에는 적합하지 않으므로 테스트용으로만 사용하는 것을 권장합니다.
 
+### 3. Unit test
+```/movie_assignment/movie/test.py```에 unit test를 작성하였습니다.
+unit test를 실행하려면 다음과 같이 명령을 입력하면 됩니다.
+```python
+python manage.py test
+```
+
 ## API
 
 API는 아래 Documentation에서 확인하실 수 있습니다.
