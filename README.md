@@ -62,7 +62,7 @@ python manage.py runserver
 
 ### 3. Unit test
 ```/movie_assignment/movie/test.py```에 unit test를 작성하였습니다.
-unit test를 실행하려면 다음과 같이 명령을 입력하면 됩니다.
+unit test를 실행하려면 프로젝트 최상위 디렉토리에서 다음과 같이 명령을 입력하면 됩니다.
 ```python
 python manage.py test
 ```
